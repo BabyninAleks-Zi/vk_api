@@ -5,9 +5,8 @@ from urllib.parse import urlparse
 
 
 def is_shorten_link(link):
-    if len(link) < 25:
+    if 'vk.cc/' in link:
         return True
-    return False
 
 
 def shorten_link(token, link):
@@ -18,26 +17,22 @@ def shorten_link(token, link):
         'private': 0
     }
     url = 'https://api.vk.ru/method/utils.getShortLink'
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data_link = response.json()
-        if 'error' in data_link:
-            error_msg = data_link['error']['error_msg']
-            if 'url' in error_msg:
-                return f'Ошибка: некорректная ссылка {link}.\
-                         Введите корректную ссылку'
-            else:
-                return f'Ошибка VK API {error_msg}'
-        short_link = data_link['response']['short_url']
-        return short_link
-    except requests.exceptions.HTTPError:
-        return 'Сетевая ошибка'
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    api_response = response.json()
+    if 'error' in api_response:
+        error_msg = api_response['error']['error_msg']
+        if 'url' in error_msg:
+            raise Exception(f'Некорректная ссылка {link}.')
+        else:
+            raise Exception(f'VK API {error_msg}')
+    short_link = api_response['response']['short_url']
+    return short_link
 
 
-def count_clicks(token, *args):
-    parsed = urlparse(*args)
-    key = parsed.path.lstrip('/')
+def count_clicks(token, link):
+    parsed_link = urlparse(link)
+    key = parsed_link.path.lstrip('/')
     params = {
         'access_token': token,
         'v': 5.199,
@@ -46,38 +41,38 @@ def count_clicks(token, *args):
         'extended': 0
     }
     url = 'https://api.vk.ru/method/utils.getLinkStats'
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data_count = response.json()
-        if 'error' in data_count:
-            error_msg = data_count['error']['error_msg']
-            return f'Ошибка VK API {error_msg}'
-        stats_list = data_count['response']['stats']
-        stat = stats_list[0]
-        return stat['views']
-    except requests.exceptions.HTTPError:
-        return 'Сетевая ошибка'
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    stat_response = response.json()
+    if 'error' in stat_response:
+        error_msg = stat_response['error']['error_msg']
+        raise Exception(f'VK API {error_msg}')
+    views_response = stat_response['response']['stats']
+    stat = views_response[0]
+    return stat['views']
 
 
-def generate_link():
+def main():
     load_dotenv()
     token = os.getenv('VK_TOKEN')
     if not token:
-        print('Ошибка: VK_TOKEN не найден в переменных окружения')
+        print('VK_TOKEN не найден в переменных окружения')
         return
     link = input('Введите ссылку: ')
-    if is_shorten_link(link):
-        clicks = count_clicks(token, link)
-        print('Вы ввели короткую ссылку')
-        print('Количество кликов по ссылке: ', clicks)
-    else:
-        print('Введена длинная ссылка, сокращаю...')
-        short_link = shorten_link(token, link)
-        print('Сокращенная ссылка: ', short_link)
-        clicks = count_clicks(token, short_link)
-        print('Количество кликов по ссылке: ', clicks)
+    try:
+        if is_shorten_link(link):
+            clicks = count_clicks(token, link)
+            print('Вы ввели короткую ссылку')
+            print('Количество кликов по ссылке: ', clicks)
+        else:
+            print('Введена длинная ссылка, сокращаю...')
+            short_link = shorten_link(token, link)
+            print('Сокращенная ссылка: ', short_link)
+    except requests.exceptions.HTTPError as err:
+        print(f'Сетевая ошибка: {err}')
+    except Exception as err:
+        print(f'Ошибка: {err}')
 
 
 if __name__ == '__main__':
-    generate_link()
+    main()

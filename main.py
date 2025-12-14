@@ -4,8 +4,21 @@ import requests
 from urllib.parse import urlparse
 
 
-def is_shorten_link(link):
-    if 'vk.cc/' in link:
+def is_shorten_link(token, link):
+    parsed_link = urlparse(link)
+    key = parsed_link.path.lstrip('/')
+    params = {
+        'access_token': token,
+        'v': 5.199,
+        'key': key,
+        'interval': 'day',
+        'extended': 0
+    }
+    url = 'https://api.vk.ru/method/utils.getLinkStats'
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    shorten_response = response.json()
+    if 'response' in shorten_response:
         return True
 
 
@@ -54,13 +67,11 @@ def count_clicks(token, link):
 
 def main():
     load_dotenv()
-    token = os.getenv('VK_TOKEN')
-    if not token:
-        print('VK_TOKEN не найден в переменных окружения')
-        return
+    
     link = input('Введите ссылку: ')
     try:
-        if is_shorten_link(link):
+        token = os.environ['VK_TOKEN']
+        if is_shorten_link(token, link):
             clicks = count_clicks(token, link)
             print('Вы ввели короткую ссылку')
             print('Количество кликов по ссылке: ', clicks)
@@ -70,6 +81,8 @@ def main():
             print('Сокращенная ссылка: ', short_link)
     except requests.exceptions.HTTPError as err:
         print(f'Сетевая ошибка: {err}')
+    except KeyError:
+        print('Ошибка: переменная окружения VK_TOKEN не установлена')
     except Exception as err:
         print(f'Ошибка: {err}')
 

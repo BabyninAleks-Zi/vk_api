@@ -67,10 +67,9 @@ def count_clicks(token, link):
 
 def main():
     load_dotenv()
-    
-    link = input('Введите ссылку: ')
     try:
         token = os.environ['VK_TOKEN']
+        link = input('Введите ссылку: ')
         if is_shorten_link(token, link):
             clicks = count_clicks(token, link)
             print('Вы ввели короткую ссылку')

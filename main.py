@@ -18,8 +18,7 @@ def is_shorten_link(token, link):
     response = requests.get(url, params=params)
     response.raise_for_status()
     shorten_response = response.json()
-    if 'response' in shorten_response:
-        return True
+    return 'response' in shorten_response
 
 
 def shorten_link(token, link):

@@ -23,7 +23,7 @@ $ pip install -r requirements.txt
 ```
 
 Документацию к библиотекам можете изучить на сайте 
-[PyPI](https://pypi.org/project/requests/).
+[PyPI](https://pypi.org/).
 
 ***
 
@@ -32,19 +32,29 @@ $ pip install -r requirements.txt
 До начала работы с репозиторием, создайте в корневом каталоге файл `.env` и 
 напишите переменную `VK_TOKEN` используя Сервисный Токен (Service Token) VK_API.
 
-Данный код работает просто, необходимо в консоли ввести команду:
+Для того чтобы узнать что делает этот скрипт и какие аргументы ему нужны, введите:
 
 ```
-$ python main.py
+$ python main.py -h
 ```
 
-После ввода вставить ссылку, на которую хотите получить короткую ссылку, либо 
-информацию по количествам произведенных кликов по ней.
+Код работает просто, необходимо в консоли ввести команду:
 
-<img width="338" height="61" alt="image" src="https://github.com/user-attachments/assets/4c83db5c-c6f1-4ebd-a264-96c41f0092d3" />
+```
+$ python main.py 'YOUR LINK'
+```
+
+После ввода вы получите короткую ссылку, как на примере ниже:
+
+<img width="497" height="61" alt="image" src="https://github.com/user-attachments/assets/3161f0b4-dace-4ffd-8119-acb2b91a5ac1" />
+
+Либо получите информацию по количествам произведенных кликов по ней:
+
+<img width="335" height="62" alt="image" src="https://github.com/user-attachments/assets/22db58fa-3d28-4536-b0a3-b5e3e437344c" />
 
 В случае если возникнет ошибка при отправке запроса, код отработает исключения и 
 укажет какая по какой причине он прекратил работу программы.
 
-<img width="475" height="71" alt="image" src="https://github.com/user-attachments/assets/f1ec879c-5623-43cf-afa0-649b98afaabc" />
+<img width="369" height="64" alt="image" src="https://github.com/user-attachments/assets/c7aae259-e9e8-4bdd-8517-147b13bb0498" />
+
 
